@@ -9,13 +9,6 @@ func _assert(condition bool, failedPrompt string) {
 	}
 }
 
-func max(a, b txid) txid {
-	if a > b {
-		return a
-	}
-	return b
-}
-
 func clone(src map[txid]struct{}, dst *map[txid]struct{}) {
 	for k := range src {
 		(*dst)[k] = struct{}{}
