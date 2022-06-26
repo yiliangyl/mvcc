@@ -43,6 +43,14 @@ func (tm *txManager) getStatus(id txid) TxStatus {
 	return tm.status[id]
 }
 
+func (tm *txManager) active(id txid) bool {
+	return tm.getStatus(id) == StatusActive
+}
+
+func (tm *txManager) committed(id txid) bool {
+	return tm.getStatus(id) == StatusCommitted
+}
+
 func (tm *txManager) snapshot(id txid) *snapshot {
 	tm.mu.RLock()
 	defer tm.mu.RUnlock()

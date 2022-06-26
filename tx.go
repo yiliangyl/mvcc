@@ -26,7 +26,7 @@ func (tx *Tx) Begin() {
 }
 
 func (tx *Tx) Commit() {
-	_assert(tx.db.tm.getStatus(tx.id) == StatusActive, "current tx is not active")
+	_assert(tx.db.tm.active(tx.id), "current tx is not active")
 
 	tx.status = StatusCommitted
 	tx.db.tm.setStatus(tx.id, tx.status)
@@ -34,7 +34,7 @@ func (tx *Tx) Commit() {
 }
 
 func (tx *Tx) Abort() {
-	_assert(tx.db.tm.getStatus(tx.id) == StatusActive, "current tx is not active")
+	_assert(tx.db.tm.active(tx.id), "current tx is not active")
 
 	tx.status = StatusAborted
 	tx.db.tm.setStatus(tx.id, tx.status)
@@ -42,7 +42,7 @@ func (tx *Tx) Abort() {
 }
 
 func (tx *Tx) Put(key, value int) error {
-	_assert(tx.db.tm.getStatus(tx.id) == StatusActive, "current tx is not active")
+	_assert(tx.db.tm.active(tx.id), "current tx is not active")
 
 	err := tx.db.write(tx, key, value)
 	if err == ErrAborted {
@@ -52,7 +52,7 @@ func (tx *Tx) Put(key, value int) error {
 }
 
 func (tx *Tx) Get(key int) (int, bool, error) {
-	_assert(tx.db.tm.getStatus(tx.id) == StatusActive, "current tx is not active")
+	_assert(tx.db.tm.active(tx.id), "current tx is not active")
 
 	value, found, err := tx.db.read(tx, key)
 	if err == ErrAborted {

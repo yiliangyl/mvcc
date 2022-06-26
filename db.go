@@ -63,14 +63,14 @@ func (v *version) write(record *record, tm *txManager) error {
 		back := v.records[len(v.records)-1]
 		if back.tmin >= record.tmin {
 			return ErrAborted
-		} else if tm.getStatus(back.tmin) == StatusCommitted {
+		} else if tm.committed(back.tmin) {
 			back.tmax = record.tmin
 		} else {
 			// the last tx is still active
 			// solution 1: stall until commit
 			// solution 2: abort
 			// TODO: use the better way to wait for committing
-			for tm.getStatus(back.tmin) == StatusActive {
+			for tm.active(back.tmin) {
 			}
 			back.tmax = record.tmin
 		}
