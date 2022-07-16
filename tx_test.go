@@ -104,3 +104,37 @@ func TestWriteConflictShouldAbort(t *testing.T) {
 	assert.Equal(t, 1, v3)
 	tx3.Commit()
 }
+
+func TestWriteSkewIsAllowed(t *testing.T) {
+	db := NewDB()
+	tx := NewTx(db)
+	tx.Begin()
+	assert.Nil(t, tx.Put(1, 1))
+	assert.Nil(t, tx.Put(2, 2))
+	tx.Commit()
+
+	tx1 := NewTx(db)
+	tx2 := NewTx(db)
+	tx1.Begin()
+	tx2.Begin()
+
+	v1, _, _ := tx1.Get(1)
+	v2, _, _ := tx2.Get(2)
+
+	assert.Nil(t, tx1.Put(2, v1))
+	assert.Nil(t, tx2.Put(1, v2))
+
+	tx1.Commit()
+	tx2.Commit()
+
+	tx = NewTx(db)
+	tx.Begin()
+	v3, _, err := tx.Get(1)
+	assert.Nil(t, err)
+	assert.Equal(t, 2, v3)
+
+	v4, _, err := tx.Get(2)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, v4)
+	tx.Commit()
+}
